@@ -4,14 +4,14 @@ import requests as requests
 import validators
 
 
-def get_url():
+def get_url(urls):
     """get user input for feed url"""
-    url = input('Enter the RSS feed URL \n')
-    if validators.url(url, public=True):
-        print("URL looks valid.")
-        return url
-    else:
-        print("Invalid URL: " + url)
+    urls = urls.split()
+    print("Validating URLs...")
+    for url in urls:
+        if not validators.url(url, public=True):
+            raise ValueError(f"invalid URL for input: {url}")
+    return urls
 
 
 def fetch_xml(url):
@@ -49,18 +49,18 @@ def display_feed(feed):
         title, link, desc = feed[var].values()
         print('Title: ' + title + '\nLink: ' + link + '\nDescription: ' + desc + '\n')
 
-    return
-
 
 def main():
     """putting the different functions together"""
     while True:
-        url = get_url()
-        if url:
-            fetch_xml(url)
-            root = parse_xml('data/latestfeed.xml')
-            feed = feed_items(root)
-            display_feed(feed)
+        url_list = input("Paste some RSS feed URLs (Separate them using a space or comma): \n\n")
+        urls = get_url(url_list)
+        if urls:
+            for url in urls:
+                fetch_xml(url)
+                root = parse_xml('data/latestfeed.xml')
+                feed = feed_items(root)
+                display_feed(feed)
         break
 
 
